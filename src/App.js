@@ -1,5 +1,5 @@
 import React, { Component} from 'react';
-import {Character, Footer, Header, Wrapper} from "./components/index";
+import {Character, Footer, Header,Message, Wrapper} from "./components/index";
 import characters from "./characters.json";
 import './App.css';
 
@@ -22,10 +22,20 @@ class App extends Component {
   };
 
   clicked = id => {
-    let prevState = this.state.characterSelect.slice();
+    let prevState = this.state.characterSelect;
     let score = this.state.score;
     let highScore = this.state.highScore;
 
+    this.makeShuffle()
+    if(this.state.characterSelect.includes(id)) {
+      this.setState({
+        score: 0,
+        highScore: highScore,
+        characterSelect: [],
+        message: "LOSER. Already clicked that one. Click images to play again."
+      })
+      return;
+    };
     if(!this.state.characterSelect.includes(id)) {
       if (score === highScore) {
         score++;
@@ -39,31 +49,20 @@ class App extends Component {
         this.setState({
           score: 0,
           highScore: score,
-          message: "WINNER. Click to play again.",
+          message: "WINNER. Click images to play again.",
           characterSelect: []
         })
         return;
-      }
+      } else { 
+        this.setState({
+          score: score,
+          highScore: highScore,
+          characterSelect: prevState,
+          message: ""
+        })
+        return;
+      };
     }
-    
-    if(this.state.characterSelect.includes(id)) {
-      this.setState({
-        score: 0,
-        highScore: highScore,
-        characterSelect: [],
-        messege: "LOSER. Already clicked that one. Click to play again."
-      })
-      return;
-    };
-
-    this.setState({
-      score:score,
-      highScore: highScore,
-      clickedCharacter: prevState,
-      message: ""
-    });
-
-    this.makeShuffle()
   }
 
   makeShuffle(){
@@ -74,6 +73,7 @@ class App extends Component {
     return (
       <>
       <Header state={this.state} />
+      <Message state={this.state}/>
       <Wrapper>
        {this.state.characters.map( character => (
         <Character 
